@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Modal, Button, Input } from '../atoms'
+import ScreencastTile from './ScreencastTile'
 import type { Profile, Instance, InstanceTab, Agent } from '../../generated/types'
 import * as api from '../../services/api'
 
@@ -183,7 +184,7 @@ export default function ProfileDetailsModal({
 
         {activeTab === 'live' && (
           <div>
-            {isRunning ? (
+            {isRunning && instance ? (
               <div>
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-sm text-text-muted">{tabs.length} tab(s)</span>
@@ -198,15 +199,13 @@ export default function ProfileDetailsModal({
                 ) : (
                   <div className="grid gap-3 sm:grid-cols-2">
                     {tabs.map((tab) => (
-                      <div
+                      <ScreencastTile
                         key={tab.id}
-                        className="rounded border border-border-subtle bg-bg-elevated p-3"
-                      >
-                        <div className="truncate text-sm font-medium text-text-primary">
-                          {tab.title || 'Untitled'}
-                        </div>
-                        <div className="truncate text-xs text-text-muted">{tab.url}</div>
-                      </div>
+                        instanceId={instance.id}
+                        tabId={tab.id}
+                        label={tab.title?.slice(0, 20) || tab.id.slice(0, 8)}
+                        url={tab.url}
+                      />
                     ))}
                   </div>
                 )}
