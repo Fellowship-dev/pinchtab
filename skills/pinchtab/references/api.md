@@ -137,6 +137,9 @@ Returns `{url, title, text}`. Cheapest option (~1K tokens for most pages).
 
 ## PDF export
 
+Prefer returning base64 or raw bytes unless the user explicitly wants a file written to disk.
+When writing to disk, use a safe temporary or workspace path.
+
 ```bash
 # CLI: pinchtab pdf --tab TAB_ID [-o file.pdf] [--landscape] [--scale 0.8]
 # Returns base64 JSON
@@ -145,8 +148,8 @@ curl "/tabs/TAB_ID/pdf"
 # Raw PDF bytes
 curl "/tabs/TAB_ID/pdf?raw=true" -o page.pdf
 
-# Save to disk
-curl "/tabs/TAB_ID/pdf?output=file&path=/tmp/page.pdf"
+# Save to disk in a safe temp location
+curl "/tabs/TAB_ID/pdf?output=file&path=/tmp/pinchtab-page.pdf"
 
 # Landscape with custom scale
 curl "/tabs/TAB_ID/pdf?landscape=true&scale=0.8&raw=true" -o page.pdf
@@ -187,12 +190,14 @@ curl "/tabs/TAB_ID/pdf?preferCSSPageSize=true&raw=true" -o css-sized.pdf
 | `generateTaggedPDF` | bool | false | Generate accessible/tagged PDF |
 | `generateDocumentOutline` | bool | false | Embed document outline |
 | `output` | string | JSON | `file` to save to disk, default returns base64 |
-| `path` | string | auto | Custom file path (with `output=file`) |
+| `path` | string | auto | Destination path (prefer temp or workspace paths with `output=file`) |
 | `raw` | bool | false | Return raw PDF bytes instead of JSON |
 
 Wraps `Page.printToPDF`. Prints background graphics by default.
 
 ## Download files
+
+Prefer raw bytes or base64 responses unless the user explicitly asks for a saved file.
 
 ```bash
 # Returns base64 JSON by default (uses browser session/cookies/stealth)
@@ -201,16 +206,18 @@ curl "/download?url=https://site.com/report.pdf"
 # Raw bytes (pipe to file)
 curl "/download?url=https://site.com/image.jpg&raw=true" -o image.jpg
 
-# Save directly to disk
-curl "/download?url=https://site.com/export.csv&output=file&path=/tmp/export.csv"
+# Save directly to disk in a safe temp location
+curl "/download?url=https://site.com/export.csv&output=file&path=/tmp/pinchtab-export.csv"
 ```
 
 ## Upload files
 
+Only upload local files the user explicitly provided or approved for the task.
+
 ```bash
 # Upload a local file to a file input
 curl -X POST "/upload?tabId=TAB_ID" -H "Content-Type: application/json" \
-  -d '{"selector": "input[type=file]", "paths": ["/tmp/photo.jpg"]}'
+  -d '{"selector": "input[type=file]", "paths": ["/tmp/user-approved-photo.jpg"]}'
 
 # Upload base64-encoded data
 curl -X POST /upload -H "Content-Type: application/json" \
@@ -228,6 +235,9 @@ curl "/screenshot?raw=true&quality=50" -o screenshot.jpg
 ```
 
 ## Evaluate JavaScript
+
+Use this sparingly. Prefer `text`, `snapshot`, and normal actions first.
+Default to read-only DOM inspection and avoid reading cookies, localStorage, or unrelated page secrets unless the user explicitly asks for that behavior.
 
 ```bash
 # CLI: pinchtab eval "document.title"

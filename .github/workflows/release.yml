@@ -224,3 +224,15 @@ jobs:
             pinchtab/pinchtab:latest
             pinchtab/pinchtab:${{ steps.meta.outputs.tag }}
             pinchtab/pinchtab:${{ steps.meta.outputs.version }}
+
+  skill:
+    name: Publish Skill
+    needs:
+      - npm
+      - docker
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.dry_run }}
+    uses: ./.github/workflows/publish-skill.yml
+    with:
+      version: ${{ github.event.inputs.tag || github.ref_name }}
+    secrets:
+      CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}

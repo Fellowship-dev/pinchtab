@@ -45,7 +45,7 @@ brews:
     test: |
       system "#{bin}/pinchtab version"
     install: |
-      bin.install "pinchtab"
+      bin.install Dir["pinchtab*"].first => "pinchtab"
 
 changelog:
   sort: asc

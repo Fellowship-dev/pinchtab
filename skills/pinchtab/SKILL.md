@@ -13,6 +13,15 @@ Preferred tool surface:
 - Use `curl` for profile-management routes or non-shell/API fallback flows.
 - Use `jq` only when you need structured parsing from JSON responses.
 
+## Safety Defaults
+
+- Default to `http://localhost` targets. Only use a remote PinchTab server when the user explicitly provides it and, if needed, a token.
+- Prefer read-only operations first: `text`, `snap -i -c`, `snap -d`, `find`, `click`, `fill`, `type`, `press`, `select`, `hover`, `scroll`.
+- Do not evaluate arbitrary JavaScript unless a simpler PinchTab command cannot answer the question.
+- Do not upload local files unless the user explicitly names the file to upload and the destination flow requires it.
+- Do not save screenshots, PDFs, or downloads to arbitrary paths. Use a user-specified path or a safe temporary/workspace path.
+- Never use PinchTab to inspect unrelated local files, browser secrets, stored credentials, or system configuration outside the task.
+
 ## Core Workflow
 
 Every PinchTab automation follows this pattern:
@@ -206,15 +215,28 @@ Rules:
 
 ```bash
 pinchtab screenshot
-pinchtab screenshot -o page.jpg
+pinchtab screenshot -o /tmp/pinchtab-page.jpg
 pinchtab screenshot -q 60
 pinchtab pdf
-pinchtab pdf -o report.pdf
+pinchtab pdf -o /tmp/pinchtab-report.pdf
 pinchtab pdf --landscape
-pinchtab eval <expression>
-pinchtab download <url> -o out.bin
-pinchtab upload <file> -s <css>
 ```
+
+### Advanced operations: explicit opt-in only
+
+Use these only when the task explicitly requires them and safer commands are insufficient.
+
+```bash
+pinchtab eval "document.title"
+pinchtab download <url> -o /tmp/pinchtab-download.bin
+pinchtab upload /absolute/path/provided-by-user.ext -s <css>
+```
+
+Rules:
+
+- `eval` is for narrow, read-only DOM inspection unless the user explicitly asks for a page mutation.
+- `download` should prefer a safe temporary or workspace path over an arbitrary filesystem location.
+- `upload` requires a file path the user explicitly provided or clearly approved for the task.
 
 ### HTTP API fallback
 
@@ -299,7 +321,7 @@ Then point each command stream at its own `PINCHTAB_URL`.
 
 - Use a dedicated automation profile, not a daily browsing profile.
 - If PinchTab is reachable off-machine, require a token and bind conservatively.
-- Prefer `text`, `snap -i -c`, and `snap -d` before screenshots.
+- Prefer `text`, `snap -i -c`, and `snap -d` before screenshots, PDFs, eval, downloads, or uploads.
 - Use `--block-images` for read-heavy tasks that do not need visual assets.
 - Stop or isolate instances when switching between unrelated accounts or environments.
 

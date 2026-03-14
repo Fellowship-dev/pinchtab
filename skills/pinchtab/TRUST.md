@@ -9,6 +9,8 @@
 - Extracts the page's accessibility tree (for AI agents)
 - Runs screenshots, PDFs, and JavaScript evaluation
 
+High-risk operations such as JavaScript evaluation, local-file upload, and direct file writes should be treated as explicit opt-in actions for the current task, not the default workflow.
+
 **All of this stays local.** No telemetry. No external API calls (except to sites you navigate to).
 
 ## What Pinchtab Does NOT Do

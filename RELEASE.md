@@ -165,6 +165,11 @@ Depends on: `release` job (waits for goreleaser to finish)
 GitHub Actions builds the release image directly from the tagged source with `docker buildx`.
 The workflow pushes the same multi-arch build to both GHCR and Docker Hub, so Docker no longer depends on GoReleaser's temporary build context.
 
+### 4. ClawHub skill
+
+The main `Release` workflow publishes the Pinchtab skill to ClawHub only after both npm and Docker complete successfully.
+The standalone `Publish Skill` workflow is manual-only and is intended for retries or one-off recovery publishes.
+
 ## Troubleshooting
 
 ### npm publish fails (403)

@@ -1,8 +1,14 @@
 name: Publish Skill
 
 on:
-  push:
-    tags: ['v*']
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      CLAWHUB_TOKEN:
+        required: true
   workflow_dispatch:
     inputs:
       version:
@@ -36,11 +42,14 @@ jobs:
 
       - name: Publish skill
         run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          elif [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION="${{ github.event.inputs.version }}"
           else
             VERSION=${GITHUB_REF_NAME#v}
           fi
+          VERSION=${VERSION#v}
           clawhub publish skills/pinchtab \
             --slug pinchtab \
             --name "Pinchtab" \
