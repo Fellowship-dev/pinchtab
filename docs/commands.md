@@ -32,6 +32,7 @@ Hidden aliases: `goto`, `navigate`, `open`
 
 ```
 pinchtab tab                     # List all tabs
+pinchtab tab <n> / <id>          # Switch to tab 
 pinchtab tab new                 # Open a new empty tab
 pinchtab tab new <url>           # Open a new tab with URL
 pinchtab tab close <id>          # Close a tab
