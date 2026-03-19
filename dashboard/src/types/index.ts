@@ -99,7 +99,12 @@ export interface BackendProfilesConfig {
 }
 
 export interface BackendMultiInstanceConfig {
-  strategy: "simple" | "explicit" | "simple-autorestart" | "always-on";
+  strategy:
+    | "simple"
+    | "explicit"
+    | "simple-autorestart"
+    | "always-on"
+    | "no-instance";
   allocationPolicy: "fcfs" | "round_robin" | "random";
   instancePortStart: number;
   instancePortEnd: number;
