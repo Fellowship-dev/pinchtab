@@ -120,6 +120,11 @@ func (s *Strategy) SetRuntimeConfig(cfg *config.RuntimeConfig) {
 	if cfg == nil {
 		return
 	}
+	// Always inherit headless mode from runtime config — the orchestrator
+	// writes an explicit mode ("headed"/"headless") into the child config,
+	// so the loaded runtime config always reflects the user's intent.
+	s.config.Headless = cfg.Headless
+	s.config.HeadlessSet = true
 	if cfg.RestartMaxRestarts != 0 {
 		s.config.MaxRestarts = cfg.RestartMaxRestarts
 	}
