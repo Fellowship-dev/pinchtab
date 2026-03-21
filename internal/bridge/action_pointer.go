@@ -60,6 +60,40 @@ func (b *Bridge) actionHover(ctx context.Context, req ActionRequest) (map[string
 	return nil, fmt.Errorf("need selector, ref, nodeId, or x/y coordinates")
 }
 
+func (b *Bridge) actionMouseDown(ctx context.Context, req ActionRequest) (map[string]any, error) {
+	if req.NodeID > 0 {
+		return map[string]any{"mousedown": true}, MouseDownByNodeID(ctx, req.NodeID)
+	}
+	if req.Selector != "" {
+		node, err := firstNodeBySelector(ctx, req.Selector)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"mousedown": true}, MouseDownByNodeID(ctx, int64(node.BackendNodeID))
+	}
+	if req.HasXY {
+		return map[string]any{"mousedown": true, "x": req.X, "y": req.Y}, MouseDownByCoordinate(ctx, req.X, req.Y)
+	}
+	return nil, fmt.Errorf("need selector, ref, nodeId, or x/y coordinates")
+}
+
+func (b *Bridge) actionMouseUp(ctx context.Context, req ActionRequest) (map[string]any, error) {
+	if req.NodeID > 0 {
+		return map[string]any{"mouseup": true}, MouseUpByNodeID(ctx, req.NodeID)
+	}
+	if req.Selector != "" {
+		node, err := firstNodeBySelector(ctx, req.Selector)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"mouseup": true}, MouseUpByNodeID(ctx, int64(node.BackendNodeID))
+	}
+	if req.HasXY {
+		return map[string]any{"mouseup": true, "x": req.X, "y": req.Y}, MouseUpByCoordinate(ctx, req.X, req.Y)
+	}
+	return nil, fmt.Errorf("need selector, ref, nodeId, or x/y coordinates")
+}
+
 func (b *Bridge) actionScroll(ctx context.Context, req ActionRequest) (map[string]any, error) {
 	if req.NodeID > 0 {
 		return map[string]any{"scrolled": true}, ScrollByNodeID(ctx, req.NodeID)

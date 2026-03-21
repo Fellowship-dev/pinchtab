@@ -79,6 +79,10 @@ var keydownCmd = newSimpleActionCmd("keydown <key>", "Hold a key down", "keydown
 
 var keyupCmd = newSimpleActionCmd("keyup <key>", "Release a key", "keyup", cobra.ExactArgs(1))
 
+var mousedownCmd = newOptionalRefActionCmd("mousedown [ref]", "Press mouse button down", "mousedown")
+
+var mouseupCmd = newOptionalRefActionCmd("mouseup [ref]", "Release mouse button", "mouseup")
+
 var scrollintoviewCmd = newOptionalRefActionCmd("scrollintoview <selector>", "Scroll element into view and return bounding box", "scrollintoview")
 
 var dialogCmd = &cobra.Command{
