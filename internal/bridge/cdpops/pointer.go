@@ -188,6 +188,75 @@ func DragByNodeID(ctx context.Context, nodeID int64, dx, dy int) error {
 	)
 }
 
+func MouseDownByCoordinate(ctx context.Context, x, y float64) error {
+	if x < 0 || y < 0 {
+		return fmt.Errorf("x/y coordinates must be >= 0")
+	}
+
+	return chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
+		return chromedp.FromContext(ctx).Target.Execute(ctx, "Input.dispatchMouseEvent", map[string]any{
+			"type":       "mousePressed",
+			"button":     "left",
+			"clickCount": 1,
+			"x":          x,
+			"y":          y,
+		}, nil)
+	}))
+}
+
+func MouseDownByNodeID(ctx context.Context, nodeID int64) error {
+	x, y, err := GetElementCenter(ctx, nodeID)
+	if err != nil {
+		return err
+	}
+
+	return chromedp.Run(ctx,
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			return chromedp.FromContext(ctx).Target.Execute(ctx, "DOM.scrollIntoViewIfNeeded", map[string]any{"backendNodeId": nodeID}, nil)
+		}),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			return chromedp.FromContext(ctx).Target.Execute(ctx, "Input.dispatchMouseEvent", map[string]any{
+				"type":       "mousePressed",
+				"button":     "left",
+				"clickCount": 1,
+				"x":          x, "y": y,
+			}, nil)
+		}),
+	)
+}
+
+func MouseUpByCoordinate(ctx context.Context, x, y float64) error {
+	if x < 0 || y < 0 {
+		return fmt.Errorf("x/y coordinates must be >= 0")
+	}
+
+	return chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
+		return chromedp.FromContext(ctx).Target.Execute(ctx, "Input.dispatchMouseEvent", map[string]any{
+			"type":       "mouseReleased",
+			"button":     "left",
+			"clickCount": 1,
+			"x":          x,
+			"y":          y,
+		}, nil)
+	}))
+}
+
+func MouseUpByNodeID(ctx context.Context, nodeID int64) error {
+	x, y, err := GetElementCenter(ctx, nodeID)
+	if err != nil {
+		return err
+	}
+
+	return chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
+		return chromedp.FromContext(ctx).Target.Execute(ctx, "Input.dispatchMouseEvent", map[string]any{
+			"type":       "mouseReleased",
+			"button":     "left",
+			"clickCount": 1,
+			"x":          x, "y": y,
+		}, nil)
+	}))
+}
+
 func HoverByCoordinate(ctx context.Context, x, y float64) error {
 	if x < 0 || y < 0 {
 		return fmt.Errorf("x/y coordinates must be >= 0")

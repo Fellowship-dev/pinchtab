@@ -19,6 +19,8 @@ const (
 	ActionKeyboardInsert = "keyboard-inserttext"
 	ActionKeyDown        = "keydown"
 	ActionKeyUp          = "keyup"
+	ActionMouseDown      = "mousedown"
+	ActionMouseUp        = "mouseup"
 	ActionScrollIntoView = "scrollintoview"
 )
 
@@ -42,6 +44,8 @@ func (b *Bridge) InitActionRegistry() {
 		ActionKeyboardInsert: b.actionKeyboardInsert,
 		ActionKeyDown:        b.actionKeyDown,
 		ActionKeyUp:          b.actionKeyUp,
+		ActionMouseDown:      b.actionMouseDown,
+		ActionMouseUp:        b.actionMouseUp,
 		ActionScrollIntoView: b.actionScrollIntoView,
 	}
 }

@@ -63,6 +63,22 @@ func DragByNodeID(ctx context.Context, nodeID int64, dx, dy int) error {
 	return bridgecdpops.DragByNodeID(ctx, nodeID, dx, dy)
 }
 
+func MouseDownByCoordinate(ctx context.Context, x, y float64) error {
+	return bridgecdpops.MouseDownByCoordinate(ctx, x, y)
+}
+
+func MouseDownByNodeID(ctx context.Context, nodeID int64) error {
+	return bridgecdpops.MouseDownByNodeID(ctx, nodeID)
+}
+
+func MouseUpByCoordinate(ctx context.Context, x, y float64) error {
+	return bridgecdpops.MouseUpByCoordinate(ctx, x, y)
+}
+
+func MouseUpByNodeID(ctx context.Context, nodeID int64) error {
+	return bridgecdpops.MouseUpByNodeID(ctx, nodeID)
+}
+
 func HoverByCoordinate(ctx context.Context, x, y float64) error {
 	return bridgecdpops.HoverByCoordinate(ctx, x, y)
 }
