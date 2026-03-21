@@ -89,8 +89,18 @@ func setupAllocator(cfg *config.RuntimeConfig, hooks Hooks) (context.Context, co
 		chromedp.NoFirstRun,
 		chromedp.NoDefaultBrowserCheck,
 	}
-	for _, flag := range DefaultChromeFlagArgs() {
-		opts = appendExecAllocatorFlag(opts, flag)
+	// maximum stealth: launch Chrome with minimal flags (like nodriver)
+	// to avoid fingerprint detection by anti-bot systems
+	if cfg.StealthLevel != "maximum" {
+		for _, flag := range DefaultChromeFlagArgs() {
+			opts = appendExecAllocatorFlag(opts, flag)
+		}
+	} else {
+		// Only the essentials — disable-blink-features hides webdriver signal
+		opts = append(opts,
+			chromedp.Flag("disable-blink-features", "AutomationControlled"),
+			chromedp.Flag("enable-automation", false),
+		)
 	}
 
 	chromeBinary := cfg.ChromeBinary
@@ -103,11 +113,13 @@ func setupAllocator(cfg *config.RuntimeConfig, hooks Hooks) (context.Context, co
 
 	if cfg.Headless {
 		opts = append(opts, chromedp.Flag("headless", "new"))
-		opts = append(opts, chromedp.Flag("hide-scrollbars", true))
-		opts = append(opts, chromedp.Flag("mute-audio", true))
-		opts = append(opts, chromedp.Flag("disable-vulkan", true))
-		opts = append(opts, chromedp.Flag("use-angle", "swiftshader"))
-		opts = append(opts, chromedp.DisableGPU)
+		if cfg.StealthLevel != "maximum" {
+			opts = append(opts, chromedp.Flag("hide-scrollbars", true))
+			opts = append(opts, chromedp.Flag("mute-audio", true))
+			opts = append(opts, chromedp.Flag("disable-vulkan", true))
+			opts = append(opts, chromedp.Flag("use-angle", "swiftshader"))
+			opts = append(opts, chromedp.DisableGPU)
+		}
 	} else {
 		opts = append(opts, chromedp.Flag("headless", false))
 	}
@@ -128,7 +140,7 @@ func setupAllocator(cfg *config.RuntimeConfig, hooks Hooks) (context.Context, co
 			slog.Info("loading extensions", "paths", joined)
 		}
 		opts = append(opts, chromedp.Flag("enable-automation", false))
-	} else {
+	} else if cfg.StealthLevel != "maximum" {
 		opts = append(opts, chromedp.Flag("disable-extensions", true))
 		opts = append(opts, chromedp.Flag("enable-automation", false))
 	}
@@ -362,23 +374,30 @@ func appendChromeCompatibilityFlags(args []string) []string {
 }
 
 func BuildChromeArgs(cfg *config.RuntimeConfig, port int) []string {
-	args := append([]string{fmt.Sprintf("--remote-debugging-port=%d", port)}, DefaultChromeFlagArgs()...)
+	args := []string{fmt.Sprintf("--remote-debugging-port=%d", port)}
+	if cfg.StealthLevel != "maximum" {
+		args = append(args, DefaultChromeFlagArgs()...)
+	} else {
+		args = append(args, "--disable-blink-features=AutomationControlled")
+	}
 
 	if len(cfg.ExtensionPaths) > 0 {
 		joined := strings.Join(cfg.ExtensionPaths, ",")
 		args = append(args, "--load-extension="+joined, "--disable-extensions-except="+joined)
-	} else {
+	} else if cfg.StealthLevel != "maximum" {
 		args = append(args, "--disable-extensions")
 	}
 
 	if cfg.Headless {
-		args = append(args,
-			"--headless=new",
-			"--disable-gpu",
-			"--disable-vulkan",
-			"--use-angle=swiftshader",
-			"--enable-unsafe-swiftshader",
-		)
+		args = append(args, "--headless=new")
+		if cfg.StealthLevel != "maximum" {
+			args = append(args,
+				"--disable-gpu",
+				"--disable-vulkan",
+				"--use-angle=swiftshader",
+				"--enable-unsafe-swiftshader",
+			)
+		}
 	}
 
 	if cfg.ProfileDir != "" {
