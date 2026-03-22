@@ -129,7 +129,14 @@ func (b *Bridge) actionDrag(ctx context.Context, req ActionRequest) (map[string]
 		}
 		return map[string]any{"dragged": true, "dragX": req.DragX, "dragY": req.DragY}, nil
 	}
-	return nil, fmt.Errorf("need selector, ref, or nodeId")
+	if req.HasXY {
+		err := DragByCoordinate(ctx, req.X, req.Y, req.DragX, req.DragY)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"dragged": true, "x": req.X, "y": req.Y, "dragX": req.DragX, "dragY": req.DragY}, nil
+	}
+	return nil, fmt.Errorf("need selector, ref, nodeId, or x/y coordinates")
 }
 
 func (b *Bridge) actionHTML5Drag(ctx context.Context, req ActionRequest) (map[string]any, error) {

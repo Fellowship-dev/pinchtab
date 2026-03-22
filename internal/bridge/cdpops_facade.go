@@ -63,6 +63,10 @@ func DragByNodeID(ctx context.Context, nodeID int64, dx, dy int) error {
 	return bridgecdpops.DragByNodeID(ctx, nodeID, dx, dy)
 }
 
+func DragByCoordinate(ctx context.Context, x, y float64, dx, dy int) error {
+	return bridgecdpops.DragByCoordinate(ctx, x, y, dx, dy)
+}
+
 func HTML5DragByNodeID(ctx context.Context, sourceNodeID, targetNodeID int64) error {
 	return bridgecdpops.HTML5DragByNodeID(ctx, sourceNodeID, targetNodeID)
 }
