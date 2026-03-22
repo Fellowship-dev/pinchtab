@@ -132,6 +132,29 @@ func (b *Bridge) actionDrag(ctx context.Context, req ActionRequest) (map[string]
 	return nil, fmt.Errorf("need selector, ref, or nodeId")
 }
 
+func (b *Bridge) actionHTML5Drag(ctx context.Context, req ActionRequest) (map[string]any, error) {
+	if req.TargetNodeID == 0 {
+		return nil, fmt.Errorf("targetNodeId required for html5drag")
+	}
+	var sourceNodeID int64
+	if req.NodeID > 0 {
+		sourceNodeID = req.NodeID
+	} else if req.Selector != "" {
+		node, err := firstNodeBySelector(ctx, req.Selector)
+		if err != nil {
+			return nil, err
+		}
+		sourceNodeID = int64(node.BackendNodeID)
+	} else {
+		return nil, fmt.Errorf("need selector, ref, or nodeId for source element")
+	}
+	err := HTML5DragByNodeID(ctx, sourceNodeID, req.TargetNodeID)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{"dragged": true, "strategy": "html5"}, nil
+}
+
 func (b *Bridge) actionHumanClick(ctx context.Context, req ActionRequest) (map[string]any, error) {
 	if req.NodeID > 0 {
 		// req.NodeID is a backendDOMNodeId from the accessibility tree
