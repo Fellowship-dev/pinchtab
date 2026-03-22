@@ -21,6 +21,7 @@ const (
 	ActionKeyUp          = "keyup"
 	ActionMouseDown      = "mousedown"
 	ActionMouseUp        = "mouseup"
+	ActionHTML5Drag      = "html5drag"
 	ActionScrollIntoView = "scrollintoview"
 )
 
@@ -46,6 +47,7 @@ func (b *Bridge) InitActionRegistry() {
 		ActionKeyUp:          b.actionKeyUp,
 		ActionMouseDown:      b.actionMouseDown,
 		ActionMouseUp:        b.actionMouseUp,
+		ActionHTML5Drag:      b.actionHTML5Drag,
 		ActionScrollIntoView: b.actionScrollIntoView,
 	}
 }

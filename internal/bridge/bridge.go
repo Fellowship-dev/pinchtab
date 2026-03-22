@@ -386,8 +386,10 @@ type ActionRequest struct {
 
 	ScrollX int `json:"scrollX"`
 	ScrollY int `json:"scrollY"`
-	DragX   int `json:"dragX"`
-	DragY   int `json:"dragY"`
+	DragX        int   `json:"dragX"`
+	DragY        int   `json:"dragY"`
+	TargetRef    string `json:"targetRef,omitempty"`
+	TargetNodeID int64  `json:"targetNodeId,omitempty"`
 
 	WaitNav bool   `json:"waitNav"`
 	Fast    bool   `json:"fast"`
